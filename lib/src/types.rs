@@ -68,12 +68,21 @@ pub struct Transaction {
     pub inputs: Vec<TransactionInput>,
     pub outputs: Vec<TransactionOutput>,
 }
+
+impl Transaction {
+    pub fn new(inputs: Vec<TransactionInput>, outputs: Vec<TransactionOutput>) -> Self {
+        Transaction { inputs, outputs }
+    }
+    pub fn hash(&self) -> ! {
+        unimplemented!()
+    }
+}
 pub struct TransactionInput {
     pub prev_transaction_output_hash: [u8; 32],
-    pub signature: [u8; 64],
+    pub signature: [u8; 64], // dummy types, will be replaced later
 }
 pub struct TransactionOutput {
     pub value: u64,
     pub unique_id: Uuid,
-    pub pubkey: [u8; 33],
+    pub pubkey: [u8; 33], // dummy types, will be replaced later
 }
