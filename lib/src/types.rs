@@ -62,4 +62,9 @@ impl BlockHeader {
         unimplemented!()
     }
 }
-pub struct Transaction;
+pub struct Transaction {
+    pub inputs: Vec<TransactionInput>,
+    pub outputs: Vec<TransactionOutput>,
+}
+pub struct TransactionInput;
+pub struct TransactionOutput;
