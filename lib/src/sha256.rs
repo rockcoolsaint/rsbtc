@@ -1,8 +1,10 @@
+use std::fmt;
+
 use crate::U256;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha256::digest;
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Hash(U256);
 impl Hash {
     // hash anything that can be serialized via ciborium
@@ -18,7 +20,7 @@ impl Hash {
         let hash = digest(&serialized);
         let hash_bytes = hex::decode(hash).unwrap();
         let hash_array: [u8; 32] = hash_bytes.as_slice().try_into().unwrap();
-        Hash(U256::from(hash_array))
+        Hash(U256::from_little_endian(&hash_array))
     }
     // check if a hash matches a target
     pub fn matches_target(&self, target: U256) -> bool {
@@ -27,5 +29,11 @@ impl Hash {
     // zero hash
     pub fn zero() -> Self {
         Hash(U256::zero())
+    }
+}
+
+impl fmt::Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:x}", self.0)
     }
 }
