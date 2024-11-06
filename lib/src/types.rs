@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
+use crate::crypto::{PublicKey, Signature};
 use chrono::{DateTime, Utc};
-use k256::{ecdsa::Signature, PublicKey};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -26,12 +26,14 @@ impl Blockchain {
         }
     }
     pub fn add_block(&mut self, block: Block) -> Result<()> {
-        // self.blocks.push(block);
-        // if this is the first block, check if the
-        // block's prev_block_hash is all zeroes
-        if block.header.prev_block_hash != Hash::zero() {
-            println!("zero hash");
-            return Err(BtcError::InvalidBlock);
+        // check if the block is valid
+        if self.blocks.is_empty() {
+            // if this is the first block, check if the
+            // block's prev_block_hash is all zeroes
+            if block.header.prev_block_hash != Hash::zero() {
+                println!("zero hash");
+                return Err(BtcError::InvalidBlock);
+            }
         } else {
             // if this is not the first block, check if the
             // block's prev_block_hash is the hash of the last block
