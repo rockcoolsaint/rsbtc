@@ -19,7 +19,7 @@ pub struct Blockchain {
     target: U256,
     blocks: Vec<Block>,
     #[serde(default, skip_serializing)]
-    mempool: Vec<Transaction>,
+    mempool: Vec<(DateTime<Utc>, Transaction)>,
 }
 
 impl Blockchain {
@@ -174,7 +174,7 @@ impl Blockchain {
         self.blocks.len() as u64
     }
     // mempool
-    pub fn mempool(&self) -> &[Transaction] {// later, we will also need to keep track of time
+    pub fn mempool(&self) -> &[(DateTime<Utc>, Transaction)] {// later, we will also need to keep track of time
         &self.mempool
     }
     // add a transaction to mempool
@@ -189,6 +189,7 @@ impl Blockchain {
             if known_inputs.contains(
                 &input.prev_transaction_output_hash
             ) {
+                println!("duplicate input");
                 return Err(BtcError::InvalidTransaction);
             }
             known_inputs
@@ -209,7 +210,7 @@ impl Blockchain {
                 .iter()
                 .enumerate()
                 .find(
-                    |(_, transaction)| {
+                    |(_, (_, transaction))| {
                         transaction
                             .outputs
                             .iter()
@@ -221,7 +222,7 @@ impl Blockchain {
                 // If we found one, unmark all of its UTXOs
                 if let Some((
                     idx,
-                    referencing_transaction,
+                    (_, referencing_transaction),
                 )) = referencing_transaction
                 {
                     for input in &referencing_transaction.inputs
@@ -268,11 +269,21 @@ impl Blockchain {
             .map(|output| output.value)
             .sum();
         if all_inputs < all_outputs {
+            print!("inputs are lower than outputs");
             return Err(BtcError::InvalidTransaction);
         }
-        self.mempool.push(transaction);
+        // Mark the UTXOs as used
+        for input in &transaction.inputs {
+            self.utxos
+                .entry(input.prev_transaction_output_hash)
+                .and_modify(|(marked, _)| {
+                    *marked = true;
+                });
+        }
+        // push the transaction to the mempool
+        self.mempool.push((Utc::now(), transaction));
         // sort by miner fee
-        self.mempool.sort_by_key(|transaction| {
+        self.mempool.sort_by_key(|(_, transaction)| {
             let all_inputs = transaction
                 .inputs
                 .iter()
