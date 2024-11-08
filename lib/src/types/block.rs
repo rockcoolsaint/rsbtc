@@ -6,6 +6,11 @@ use crate::sha256::Hash;
 use crate::util::MerkleRoot;
 use crate::U256;
 use std::collections::HashMap;
+use crate::util::Saveable;
+use std::io::{
+  Error as IoError, ErrorKind as IoErrorKind, Read,
+  Result as IoResult, Write,
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Block {
@@ -183,4 +188,26 @@ impl BlockHeader {
         }
         false
     }
+}
+
+// save and load expecting CBOR from ciborium as format
+impl Saveable for Block {
+  fn load<I: Read>(reader: I) -> IoResult<Self> {
+    ciborium::de::from_reader(reader).map_err(|_| {
+      IoError::new(
+        IoErrorKind::InvalidData,
+        "Failed to deserialize Block",
+      )
+    })
+  }
+  fn save<O: Write>(&self, writer: O) -> IoResult<()> {
+    ciborium::ser::into_writer(self, writer).map_err(
+      |_| {
+        IoError::new(
+          IoErrorKind::InvalidData,
+          "Failed to serialize Block",
+        )
+      },
+    )
+  }
 }
