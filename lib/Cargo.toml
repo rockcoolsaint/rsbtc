@@ -13,6 +13,7 @@ k256 = { version = "0.13.4", features = ["serde", "pem"] }
 rand = "0.8.5"
 serde = { version = "1.0.213", features = ["derive"] }
 sha256 = "1.5.0"
+spki = { version = "0.7.3", features = ["pem"] }
 thiserror = "1.0.65"
 uint = "0.10.0"
 uuid = { version = "1.11.0", features = ["v4", "serde"] }
