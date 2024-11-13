@@ -1,7 +1,7 @@
 use std::{env, process::exit};
 use tokio::net::TcpStream;
 
-use btclib::{crypto::PublicKey, types::Block, util::Saveable};
+use btclib::{crypto::PublicKey, network::Message, types::Block, util::Saveable};
 
 #[tokio::main]
 async fn main() {
@@ -65,4 +65,17 @@ async fn main() {
     println!(
         "Connecting to {address} to mine with {public_key:?}",
     );
+
+    let mut stream = match TcpStream::connect(&address).await {
+        Ok(stream) => stream,
+        Err(e) => {
+            eprintln!("Failed to connect to server: {}", e);
+            exit(1);
+        }
+
+    };
+    // Ask the node for work
+    println!("request work from {address}");
+    let message = Message::FetchTemplate(public_key);
+    message.send(&mut stream);
 }
