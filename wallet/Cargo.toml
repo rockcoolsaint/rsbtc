@@ -18,3 +18,4 @@ tracing-appender = "0.2.3"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "fmt"] }
 uuid = { version = "1.11.0", features = ["serde", "v4"] }
 btclib = { version = "0.1.0", path = "../lib" }
+toml = "0.8.19"
