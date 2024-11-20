@@ -3,6 +3,7 @@ use ecdsa::{signature::Signer, Signature as ECDSASignature, SigningKey, Verifyin
 use k256::Secp256k1;
 use serde::{Deserialize, Serialize};
 use spki::EncodePublicKey;
+use std::cmp::Ordering;
 use std::io::{
     Error as IoError, ErrorKind as IoErrorKind, Read,
     Result as IoResult, Write,
@@ -53,6 +54,18 @@ mod signkey_serde {
     {
         let bytes: Vec<u8> = Vec::<u8>::deserialize(deserializer)?;
         Ok(super::SigningKey::from_slice(&bytes).unwrap())
+    }
+}
+impl Ord for PublicKey {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Compare based on the serialized byte representation of the key
+        self.0.to_sec1_bytes().cmp(&other.0.to_sec1_bytes())
+    }
+}
+
+impl PartialOrd for PublicKey {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
