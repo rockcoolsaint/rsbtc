@@ -138,7 +138,7 @@ async fn main() -> Result<()> {
     let config_path = cli
         .config
         .unwrap_or_else(|| PathBuf::from("wallet_config.toml"));
-    let mut core = Core::load(config_path.clone())?;
+    let mut core = Core::load(config_path.clone()).await?;
     if let Some(node) = cli.node {
         core.config.default_node = node;
     }

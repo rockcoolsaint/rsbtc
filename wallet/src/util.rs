@@ -66,6 +66,7 @@ pub fn sats_to_btc(sats: u64) -> String {
 }
 /// Make it big lmao
 pub fn big_mode_btc(core: &Core) -> String {
-  text_to_ascii_art::convert(sats_to_btc(core.get_balance()))
+  // text_to_ascii_art::convert(sats_to_btc(core.get_balance())).unwrap()
+  text_to_ascii_art::to_art(sats_to_btc(core.get_balance()), "standard", 20, 5, 5)
     .unwrap()
 }
