@@ -10,6 +10,7 @@ use btclib::types::Transaction;
 mod core;
 mod util;
 mod tasks;
+mod ui;
 use core::Core;
 use tasks::{
     handle_transactions, ui_task, update_balance, update_utxos
@@ -25,7 +26,7 @@ struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
     #[arg(short, long, value_name = "FILE")]
-    config: Option<PathBuf>,
+    config: PathBuf,
     #[arg(short, long, value_name = "ADDRESS")]
     node: Option<String>,
 }

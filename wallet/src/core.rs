@@ -135,6 +135,11 @@ impl Core {
       if let Message::UTXOs(utxos) =
         Message::receive_async(&mut *self.stream.lock().await,).await?
       {
+        debug!(
+          "Received {} UTXOs for key: {:?}",
+          utxos.len(),
+          key.public
+        );
         // Replace the entire UTXO set for this key
         self.utxos.utxos.insert(
         key.public.clone(),

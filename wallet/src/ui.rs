@@ -3,8 +3,8 @@ use anyhow::Result;
 use cursive::event::{Event, Key};
 use cursive::traits::*;
 use cursive::views::{
-Button, Dialog, EditView, LinearLayout, Panel, ResizedView,
-TextContent, TextView,
+  Button, Dialog, EditView, LinearLayout, Panel, ResizedView,
+  TextContent, TextView,
 };
 use cursive::Cursive;
 use std::sync::{Arc, Mutex};
@@ -60,7 +60,7 @@ fn setup_siv(
 fn setup_menubar(siv: &mut Cursive, core: Arc<Core>) {
   siv.menubar()
     .add_leaf("Send", move |s| {
-      show_send_transaction(s, core.clone())
+      show_send_transaction(s, core.clone());
     })
     .add_leaf("Quit", |s| s.quit());
   siv.set_autohide_menu(false);
@@ -122,7 +122,7 @@ fn show_send_transaction(s: &mut Cursive, core: Arc<Core>) {
           siv,
           core.clone(),
           *unit.lock().unwrap(),
-        )
+        );
       })
       .button("Cancel", |siv| {
         debug!("Transaction cancelled");
@@ -168,7 +168,7 @@ fn switch_unit(s: &mut Cursive, unit: Arc<Mutex<Unit>>) {
   });
 }
 /// Process the send transaction request.
-fn send_transaction(
+async fn send_transaction(
   s: &mut Cursive,
   core: Arc<Core>,
   unit: Unit,
@@ -193,7 +193,7 @@ fn send_transaction(
     recipient, amount_sats
   );
   match core
-    .send_transaction_async(recipient.as_str(), amount_sats)
+    .send_transaction_async(recipient.as_str(), amount_sats).await
   {
     Ok(_) => show_success_dialog(s),
     Err(e) => show_error_dialog(s, e),
